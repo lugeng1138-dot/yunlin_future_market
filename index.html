@@ -130,22 +130,54 @@
     // 1) ?img=https://... （單張）
     // 2) ?img=url1,url2,url3   （逗號分隔，隨機一張）
     // 3) ?img=random 搭配 fallbackImages
+let lastIndex = -1; // 記錄上一次抽到的 index
+
+function withBust(url){
+  const sep = url.includes('?') ? '&' : '?';
+  return url + sep + 'v=' + Math.random();
+}
+
 function pickImage(){
   const imgParam = q.get('img');
-  if(imgParam){
-    if(imgParam === 'random'){
-      if(fallbackImages.length){
-        return fallbackImages[Math.floor(Math.random()*fallbackImages.length)] + "?v=" + Math.random();
+
+  // A. 如果網址參數指定圖片
+  if (imgParam){
+    if (imgParam === 'random'){
+      if (fallbackImages.length){
+        let idx;
+        do {
+          idx = Math.floor(Math.random() * fallbackImages.length);
+        } while (idx === lastIndex && fallbackImages.length > 1);
+        lastIndex = idx;
+        return withBust(fallbackImages[idx]);
       }
-    } else if(imgParam.includes(',')){
-      const list = imgParam.split(',').map(s=>s.trim()).filter(Boolean);
-      return list[Math.floor(Math.random()*list.length)] + "?v=" + Math.random();
+    } else if (imgParam.includes(',')){
+      const list = imgParam.split(',').map(s => s.trim()).filter(Boolean);
+      if (list.length){
+        let idx;
+        do {
+          idx = Math.floor(Math.random() * list.length);
+        } while (idx === lastIndex && list.length > 1);
+        lastIndex = idx;
+        return withBust(list[idx]);
+      }
     } else {
-      return imgParam + "?v=" + Math.random();
+      return withBust(imgParam);
     }
   }
-  // 預設狀態：從 fallbackImages 抽一張
-  return fallbackImages[Math.floor(Math.random()*fallbackImages.length)] + "?v=" + Math.random();
+
+  // B. 沒有參數 → 從 fallbackImages 抽
+  if (fallbackImages.length){
+    let idx;
+    do {
+      idx = Math.floor(Math.random() * fallbackImages.length);
+    } while (idx === lastIndex && fallbackImages.length > 1);
+    lastIndex = idx;
+    return withBust(fallbackImages[idx]);
+  }
+
+  // C. 最後備援
+  return withBust("https://images.unsplash.com/photo-1528476513691-07bfa1e0e7d5?q=80&w=1600&auto=format&fit=crop");
 }
 
     // 設定標題與副標
