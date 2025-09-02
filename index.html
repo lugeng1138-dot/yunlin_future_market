@@ -28,10 +28,14 @@
       display:flex; align-items:center; justify-content:space-between; padding:16px 20px; mix-blend:normal;
     }
     .brand{display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--fg)}
-    .logo{
-      width:36px; height:36px; border-radius:10px; background: linear-gradient(135deg, var(--brand), var(--brand-2));
-      box-shadow: 0 0 0 6px var(--ring);
-    }
+    .logo {
+  width:36px;
+  height:36px;
+  object-fit: contain; /* 保持比例縮放 LOGO */
+  border-radius:0;      /* 如果不想要圓角，就設為0 */
+  background:none;      /* 移除背景漸層 */
+  box-shadow:none;      /* 移除外圈光暈 */
+}
     .brand h1{font-size:16px; margin:0; letter-spacing:.04em; font-weight:700}
     .badge{font-size:12px; padding:6px 10px; border-radius:999px; background:rgba(125,226,167,.12); color:var(--brand-2); border:1px solid rgba(125,226,167,.35)}
 
