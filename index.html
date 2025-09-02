@@ -63,7 +63,12 @@
       padding:10px 14px; border-radius:12px; font-size:14px; line-height:1; display:inline-flex; gap:8px; align-items:center; cursor:pointer;
       transition:.18s ease; text-decoration:none;
     }
-    .btn.primary{ background:linear-gradient(135deg, var(--brand), var(--brand-2)); color:#0b0b0f; border-color:transparent; font-weight:700 }
+    .btn.primary {
+  background: var(--card);   /* 跟 chip 一樣的深色背景 */
+  color: var(--fg);          /* 白色文字 */
+  border: 1px solid rgba(255,255,255,.12);
+  font-weight: 700;
+}
     .chip:hover,.btn:hover{ transform:translateY(-1px); box-shadow:0 8px 24px rgba(0,0,0,.25) }
     .btn:active{ transform:translateY(0) }
 
