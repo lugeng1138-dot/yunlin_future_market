@@ -130,55 +130,64 @@
     // 1) ?img=https://... （單張）
     // 2) ?img=url1,url2,url3   （逗號分隔，隨機一張）
     // 3) ?img=random 搭配 fallbackImages
-let lastIndex = -1; // 記錄上一次抽到的 index
+// 用 sessionStorage 記錄上一張的索引（同一分頁期間有效）
+const STORAGE_KEY = 'ycdc_last_idx';
+
+// 讀取上一張（沒有就用 -1）
+function getLastIndex() {
+  const n = Number(sessionStorage.getItem(STORAGE_KEY));
+  return Number.isInteger(n) ? n : -1;
+}
+
+// 寫入這一張
+function setLastIndex(i) {
+  sessionStorage.setItem(STORAGE_KEY, String(i));
+}
 
 function withBust(url){
   const sep = url.includes('?') ? '&' : '?';
   return url + sep + 'v=' + Math.random();
 }
 
+function pickFrom(list){
+  if (!list.length) return null;
+  // 取出上一張，避免連續重複
+  const last = getLastIndex();
+  let idx;
+  // 若只有 1 張直接回傳
+  if (list.length === 1) {
+    idx = 0;
+  } else {
+    do {
+      idx = Math.floor(Math.random() * list.length);
+    } while (idx === last);
+  }
+  setLastIndex(idx);
+  return withBust(list[idx]);
+}
+
 function pickImage(){
   const imgParam = q.get('img');
 
-  // A. 如果網址參數指定圖片
   if (imgParam){
     if (imgParam === 'random'){
-      if (fallbackImages.length){
-        let idx;
-        do {
-          idx = Math.floor(Math.random() * fallbackImages.length);
-        } while (idx === lastIndex && fallbackImages.length > 1);
-        lastIndex = idx;
-        return withBust(fallbackImages[idx]);
-      }
+      return pickFrom(fallbackImages) ||
+             withBust('https://images.unsplash.com/photo-1528476513691-07bfa1e0e7d5?q=80&w=1600&auto=format&fit=crop');
     } else if (imgParam.includes(',')){
       const list = imgParam.split(',').map(s => s.trim()).filter(Boolean);
-      if (list.length){
-        let idx;
-        do {
-          idx = Math.floor(Math.random() * list.length);
-        } while (idx === lastIndex && list.length > 1);
-        lastIndex = idx;
-        return withBust(list[idx]);
-      }
+      return pickFrom(list) ||
+             withBust('https://images.unsplash.com/photo-1528476513691-07bfa1e0e7d5?q=80&w=1600&auto=format&fit=crop');
     } else {
+      // 指定單一網址就不用避重
       return withBust(imgParam);
     }
   }
 
-  // B. 沒有參數 → 從 fallbackImages 抽
-  if (fallbackImages.length){
-    let idx;
-    do {
-      idx = Math.floor(Math.random() * fallbackImages.length);
-    } while (idx === lastIndex && fallbackImages.length > 1);
-    lastIndex = idx;
-    return withBust(fallbackImages[idx]);
-  }
-
-  // C. 最後備援
-  return withBust("https://images.unsplash.com/photo-1528476513691-07bfa1e0e7d5?q=80&w=1600&auto=format&fit=crop");
+  // 沒帶參數 → 從 fallbackImages 抽
+  return pickFrom(fallbackImages) ||
+         withBust('https://images.unsplash.com/photo-1528476513691-07bfa1e0e7d5?q=80&w=1600&auto=format&fit=crop');
 }
+
 
     // 設定標題與副標
     const pageTitle = q.get('title') || '雲林未來超市';
