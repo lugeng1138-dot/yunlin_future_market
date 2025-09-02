@@ -116,6 +116,11 @@
     // 讀取查詢參數
     const q = new URLSearchParams(location.search);
     const fallbackImages = [
+        "https://lugeng1138-dot.github.io/yunlin_future_market/assets/收據條碼內頁_01_0.png",
+        "https://lugeng1138-dot.github.io/yunlin_future_market/assets/收據條碼內頁_02_0.png",
+        "https://lugeng1138-dot.github.io/yunlin_future_market/assets/收據條碼內頁_03_0.png",
+        "https://lugeng1138-dot.github.io/yunlin_future_market/assets/收據條碼內頁_04_0.png",
+        "https://lugeng1138-dot.github.io/yunlin_future_market/assets/收據條碼內頁_05_0.png"
       // 放入示意圖連結 (建議換成你方圖床/官網 CDN)
       // 例如："https://your.cdn/ycdc/egg-01.jpg",
       //      "https://your.cdn/ycdc/egg-02.jpg"
@@ -125,23 +130,23 @@
     // 1) ?img=https://... （單張）
     // 2) ?img=url1,url2,url3   （逗號分隔，隨機一張）
     // 3) ?img=random 搭配 fallbackImages
-    function pickImage(){
-      const imgParam = q.get('img');
-      if(imgParam){
-        if(imgParam === 'random'){
-          if(fallbackImages.length){
-            return fallbackImages[Math.floor(Math.random()*fallbackImages.length)];
-          }
-        } else if(imgParam.includes(',')){
-          const list = imgParam.split(',').map(s=>s.trim()).filter(Boolean);
-          return list[Math.floor(Math.random()*list.length)];
-        } else {
-          return imgParam; // 單一網址
-        }
+function pickImage(){
+  const imgParam = q.get('img');
+  if(imgParam){
+    if(imgParam === 'random'){
+      if(fallbackImages.length){
+        return fallbackImages[Math.floor(Math.random()*fallbackImages.length)] + "?v=" + Math.random();
       }
-      // 無參數時的預設占位圖（請換成你們的預設圖）
-      return 'https://lugeng1138-dot.github.io/yunlin_future_market/DSC01887.JPG';
+    } else if(imgParam.includes(',')){
+      const list = imgParam.split(',').map(s=>s.trim()).filter(Boolean);
+      return list[Math.floor(Math.random()*list.length)] + "?v=" + Math.random();
+    } else {
+      return imgParam + "?v=" + Math.random();
     }
+  }
+  // 預設狀態：從 fallbackImages 抽一張
+  return fallbackImages[Math.floor(Math.random()*fallbackImages.length)] + "?v=" + Math.random();
+}
 
     // 設定標題與副標
     const pageTitle = q.get('title') || '雲林未來超市';
